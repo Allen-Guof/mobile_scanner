@@ -1,6 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="dev.steenbakker.mobile_scanner">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="dev.steenbakker.mobile_scanner">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <application>
+        <!--移除此provider, 在隐私同意之后才去初始化，不符合隐私规定  -->
+        <provider
+            android:name="com.google.mlkit.common.internal.MlKitInitProvider"
+            android:authorities="${applicationId}.mlkitinitprovider"
+            android:exported="false"
+            android:initOrder="99"
+            tools:node="remove"/>
+    </application>
 </manifest>

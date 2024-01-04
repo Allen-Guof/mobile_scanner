@@ -162,6 +162,12 @@ class MobileScannerController {
     return arguments;
   }
 
+  // manual init ml kit
+  // only work on Android
+  static Future<void> init() async {
+    await _methodChannel.invokeMethod('init');
+  }
+
   /// Start scanning for barcodes.
   /// Upon calling this method, the necessary camera permission will be requested.
   ///

@@ -7,6 +7,7 @@ import android.os.Looper
 import android.util.Size
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
+import com.google.mlkit.common.MlKit
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import dev.steenbakker.mobile_scanner.objects.BarcodeFormats
 import dev.steenbakker.mobile_scanner.objects.DetectionSpeed
@@ -24,7 +25,7 @@ class MobileScannerHandler(
     binaryMessenger: BinaryMessenger,
     private val permissions: MobileScannerPermissions,
     private val addPermissionListener: (RequestPermissionsResultListener) -> Unit,
-    textureRegistry: TextureRegistry): MethodChannel.MethodCallHandler {
+    private val textureRegistry: TextureRegistry): MethodChannel.MethodCallHandler {
 
     private val analyzerCallback: AnalyzerCallback = { barcodes: List<Map<String, Any?>>?->
         if (barcodes != null) {
@@ -82,7 +83,7 @@ class MobileScannerHandler(
         methodChannel = MethodChannel(binaryMessenger,
             "dev.steenbakker.mobile_scanner/scanner/method")
         methodChannel!!.setMethodCallHandler(this)
-        mobileScanner = MobileScanner(activity, textureRegistry, callback, errorCallback)
+//        mobileScanner = MobileScanner(activity, textureRegistry, callback, errorCallback)
     }
 
     fun dispose(activityPluginBinding: ActivityPluginBinding) {
@@ -99,6 +100,11 @@ class MobileScannerHandler(
 
     @ExperimentalGetImage
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        if (call.method == "init" && mobileScanner == null) {
+            MlKit.initialize(activity)
+            mobileScanner = MobileScanner(activity, textureRegistry, callback, errorCallback)
+            return
+        }
         if (mobileScanner == null) {
             result.error("MobileScanner", "Called ${call.method} before initializing.", null)
             return
