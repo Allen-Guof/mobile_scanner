@@ -71,6 +71,10 @@ class MobileScannerHandler(
 
     private var mobileScanner: MobileScanner? = null
 
+    companion object{
+        private var isInit = false
+    }
+
     private val torchStateCallback: TorchStateCallback = {state: Int ->
         barcodeHandler.publishEvent(mapOf("name" to "torchState", "data" to state))
     }
@@ -101,7 +105,10 @@ class MobileScannerHandler(
     @ExperimentalGetImage
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         if (call.method == "init" && mobileScanner == null) {
-            MlKit.initialize(activity)
+            if (!isInit) {
+                isInit = true
+                MlKit.initialize(activity)
+            }
             mobileScanner = MobileScanner(activity, textureRegistry, callback, errorCallback)
             return
         }
